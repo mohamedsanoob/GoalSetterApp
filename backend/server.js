@@ -1,8 +1,13 @@
 const express = require('express')
 const dotenv = require('dotenv').config()
+const colors = require('colors')
 const { errorHandler } = require('./middleware/errorMiddleware')
+const mongoose = require('mongoose')
+
+const { connectDB } = require('./config/db')
 const PORT = process.env.PORT || 5000
 
+connectDB()
 const app = express()
 
 app.use(express.json())
