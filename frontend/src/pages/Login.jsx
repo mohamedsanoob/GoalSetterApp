@@ -1,15 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { FaSignInAlt } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import Spinner from '../components/Spinner'
 import axios from 'axios'
+import { AuthContext } from '../context/AuthContext'
 
 function Login() {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     })
+
+    const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext)
+    const {user,setUser}=useContext(AuthContext)
 
     const { email, password } = formData
 
@@ -39,18 +43,27 @@ function Login() {
         e.preventDefault()
 
         const res = await axios.post('http://localhost:5000/api/users/login', formData)
-        console.log(res)
-        if (res) {
-            navigate('/', {
-                state: {
-                    token: res?.data?.token,
-                    id: res?.data?._id,
-                    name: res?.data?.name
-                }
-            })
-        } else {
-            <h1>Invalid credentials</h1>
+        console.log(res?.data?.token, 'resd')
+        if (res?.data?.token) {
+            localStorage.setItem('accessToken', res?.data?.token)
+            setIsAuthenticated(true)
+            setUser(res?.data)
+            navigate('/')
         }
+
+        // console.log(res)
+        // if (res) {
+        //     navigate('/', {
+        //         state: {
+        //             token: res?.data?.token,
+        //             id: res?.data?._id,
+        //             name: res?.data?.name
+        //         }
+        //     })
+        // } else {
+        //     <h1>Invalid credentials</h1>
+        // }
+
 
     }
 

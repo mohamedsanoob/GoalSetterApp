@@ -1,12 +1,29 @@
-import { useState } from 'react'
+import axios from 'axios';
+import { useContext, useState } from 'react'
+import { AuthContext } from '../context/AuthContext';
 
 function GoalForm() {
   const [text, setText] = useState('')
-
+  const { goals, setGoals } = useContext(AuthContext)
 
   const onSubmit = (e) => {
     e.preventDefault()
+    axios.post('http://localhost:5000/api/goals', { text }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+      .then(response => {
+        console.log(response?.data, 'response');
+        setGoals(prevGoals => [...prevGoals, response?.data])
+        setText('')
+      })
+      .catch(error => {
+        console.error('Error fetching goals:', error);
+      });
+    console.log('adeed')
   }
+  console.log(goals, 'goal')
 
   return (
     <section className='form'>

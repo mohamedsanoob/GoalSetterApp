@@ -1,46 +1,62 @@
-import { useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import GoalForm from '../components/GoalForm'
 import GoalItem from '../components/GoalItem'
-import Spinner from '../components/Spinner'
+import axios from 'axios'
+import { AuthContext } from '../context/AuthContext'
 
 function Dashboard() {
-    const location = useLocation()
-    console.log(location.state)
+
+    const { goals, setGoals } = useContext(AuthContext)
+    const {user,setUser}=useContext(AuthContext)
+
     const navigate = useNavigate()
 
+    console.log(localStorage.getItem('accessToken'), 'loc')
 
-    //   useEffect(() => {
-    //     if (isError) {
-    //       console.log(message)
-    //     }
+    useEffect(() => {
+        axios.get('http://localhost:5000/api/goals', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+            }
+        })
+            .then(response => {
+                console.log(response?.data, 'response');
+                setGoals( response?.data)
+                
+            })
+            .catch(error => {
+                console.error('Error fetching goals:', error);
+            });
 
-    //     if (!user) {
-    //       navigate('/login')
-    //     }
+    },[])
 
 
-    //     return () => {
-    //       dispatch(reset())
-    //     }
-    //   }, [user, navigate, isError, message, dispatch])
-
-    //   if (isLoading) {
-    //     return <Spinner />
-    //   }
-
+    // console.log(goals, 'goal')
     return (
         <>
 
             <section className='heading'>
-                <h1>Welcome {location?.state?.name}</h1>
+                <h1>Welcome {user.name}</h1>
                 <p>Goals Dashboard</p>
             </section>
 
             <GoalForm />
 
-            <section className='content'>
+            {/* <section className='content'>
                 <h3>You have not set any goals</h3>
+            </section> */}
+
+            <section className='content'>
+                {goals.length > 0 ? (
+                    <div className='goals'>
+                        {goals.map((goal) => (
+                            <GoalItem key={goal._id} goal={goal} />
+                        ))}
+                    </div>
+                ) : (
+                    <h3>You have not set any goals</h3>
+                )}
             </section>
         </>
     )

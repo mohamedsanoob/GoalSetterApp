@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { FaUser } from 'react-icons/fa'
 import Spinner from '../components/Spinner'
+import axios from 'axios'
+import { AuthContext } from '../context/AuthContext'
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -12,22 +14,24 @@ function Register() {
     password2: '',
   })
 
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext)
+
   const { name, email, password, password2 } = formData
 
   const navigate = useNavigate()
 
 
-//   useEffect(() => {
-//     if (isError) {
-//       toast.error(message)
-//     }
+  //   useEffect(() => {
+  //     if (isError) {
+  //       toast.error(message)
+  //     }
 
-//     if (isSuccess || user) {
-//       navigate('/')
-//     }
+  //     if (isSuccess || user) {
+  //       navigate('/')
+  //     }
 
-//     dispatch(reset())
-//   }, [user, isError, isSuccess, message, navigate, dispatch])
+  //     dispatch(reset())
+  //   }, [user, isError, isSuccess, message, navigate, dispatch])
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -36,23 +40,25 @@ function Register() {
     }))
   }
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
 
     if (password !== password2) {
       toast.error('Passwords do not match')
     } else {
-      const userData = {
-        name,
-        email,
-        password,
+      const res = await axios.post('http://localhost:5000/api/users', formData)
+      console.log(res, 'reg')
+      if (res?.data?.token) {
+        localStorage.setItem('accessToken', res?.data?.token)
+        setIsAuthenticated(true)
+        navigate('/')
       }
     }
   }
 
-//   if (isLoading) {
-//     return <Spinner />
-//   }
+  //   if (isLoading) {
+  //     return <Spinner />
+  //   }
 
   return (
     <>

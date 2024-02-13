@@ -1,14 +1,17 @@
+import { useContext } from 'react'
 import { FaSignInAlt, FaSignOutAlt, FaUser } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
+import { AuthContext } from '../context/AuthContext'
 
 function Header() {
     const navigate = useNavigate()
 
     const onLogout = () => {
-        navigate('/')
+        // localStorage.clear()
+        setIsAuthenticated(false)
     }
 
-    const user = false
+    const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext)
 
     return (
         <header className='header'>
@@ -16,7 +19,7 @@ function Header() {
                 <Link to='/'>GoalSetter</Link>
             </div>
             <ul>
-                {user ? (
+                {isAuthenticated ? (
                     <li>
                         <button className='btn' onClick={onLogout}>
                             <FaSignOutAlt /> Logout
